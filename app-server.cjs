@@ -3,7 +3,6 @@ const { readFile } = require("node:fs/promises");
 const { extname, join, normalize } = require("node:path");
 
 const DEFAULT_PORT = Number(process.env.PORT || 5173);
-const PUBLIC_DIR = process.env.PUBLIC_DIR || join(process.cwd(), "public");
 const REMOTE_ORIGIN = "https://office.jbedu.kr";
 
 const contentTypes = {
@@ -19,9 +18,10 @@ function send(res, status, body, headers = {}) {
 }
 
 function safePublicPath(pathname) {
+  const publicDir = process.env.PUBLIC_DIR || join(process.cwd(), "public");
   const requested = pathname === "/" ? "/index.html" : pathname;
   const normalized = normalize(requested).replace(/^(\.\.[/\\])+/, "");
-  return join(PUBLIC_DIR, normalized);
+  return join(publicDir, normalized);
 }
 
 async function proxyRemotePage(req, res, requestUrl) {
