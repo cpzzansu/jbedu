@@ -1,4 +1,5 @@
 const path = require("node:path");
+const { pathToFileURL } = require("node:url");
 const { app, BrowserWindow, dialog, ipcMain, shell } = require("electron");
 const { writeFile } = require("node:fs/promises");
 
@@ -9,7 +10,8 @@ let appUrl;
 
 async function startLocalApp() {
   process.env.PUBLIC_DIR = path.join(app.getAppPath(), "public");
-  const module = await import(path.join(app.getAppPath(), "server.js"));
+  const serverUrl = pathToFileURL(path.join(app.getAppPath(), "server.js")).href;
+  const module = await import(serverUrl);
   server = await module.startServer(PORT);
   const address = server.address();
   appUrl = `http://127.0.0.1:${address.port}`;
@@ -40,16 +42,21 @@ function createWindow() {
   mainWindow.loadURL(appUrl);
 }
 
-app.whenReady().then(async () => {
-  await startLocalApp();
-  createWindow();
+app.whenReady()
+  .then(async () => {
+    await startLocalApp();
+    createWindow();
 
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
+    app.on("activate", () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+      }
+    });
+  })
+  .catch((error) => {
+    dialog.showErrorBox("앱 실행 실패", error.stack || error.message);
+    app.quit();
   });
-});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
