@@ -16,7 +16,7 @@
   },
   "build": {
     "appId": "kr.jbedu.mealpdf",
-    "productName": "전북교육연수원 식단 PDF",
+    "productName": "JBEdu Meal PDF",
     "directories": {
       "output": "dist"
     },
@@ -30,7 +30,12 @@
     "win": {
       "target": [
         "nsis"
-      ]
+      ],
+      "artifactName": "JBEdu-Meal-PDF-Setup-${version}-${arch}.${ext}"
+    },
+    "mac": {
+      "artifactName": "JBEdu-Meal-PDF-${version}-${arch}.${ext}",
+      "category": "public.app-category.education"
     },
     "nsis": {
       "oneClick": false,
