@@ -1,7 +1,7 @@
 const path = require("node:path");
-const { pathToFileURL } = require("node:url");
 const { app, BrowserWindow, dialog, ipcMain, shell } = require("electron");
 const { writeFile } = require("node:fs/promises");
+const { startServer } = require("../app-server.cjs");
 
 const PORT = Number(process.env.PORT || 0);
 let server;
@@ -10,9 +10,7 @@ let appUrl;
 
 async function startLocalApp() {
   process.env.PUBLIC_DIR = path.join(app.getAppPath(), "public");
-  const serverUrl = pathToFileURL(path.join(app.getAppPath(), "server.js")).href;
-  const module = await import(serverUrl);
-  server = await module.startServer(PORT);
+  server = await startServer(PORT);
   const address = server.address();
   appUrl = `http://127.0.0.1:${address.port}`;
 }
